@@ -95,9 +95,9 @@ def appear_from_back(pixels, color=(255, 0, 0)):
             time.sleep(0.02)
             
 def test_led(pixels):
-    pixels.set_pixel(1, Adafruit_WS2801.RGB_to_color( 255,255,255 ))
-    pixels.show()
-
+    for i in range(pixels.count()):
+           pixels.set_pixel(i, Adafruit_WS2801.RGB_to_color( 255,255,255 ))
+           pixels.show()
 
  
 if __name__ == "__main__":
