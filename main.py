@@ -9,8 +9,10 @@ import Adafruit_GPIO.SPI as SPI
 # ---------------------------------------------------------------------------------------------------------
 
 # Hier kommen Konstanten hin, das heißt Variablen die ihren Wert zu Laufzeit nicht ändern sollen. Das drückt man damit aus, indem man dem Namen nur Großbuchstaben gibt. ACHTUNG: die Bezeichnungen müssen eindeutig sein, das heißt kein Name darf mehr als einmal vorkommen
-BUTTON_GPIO_ROT = 17
-BUTTON_GPIO_BLAU = 16
+BUTTON_GPIO_ROT = 16
+BUTTON_GPIO_BLAU = 26
+BUTTON_GPIO_GELB = 19
+BUTTON_GPIO_GRUEN = 13
 LED_COUNT = 100
 
 # Hier wird die Schnittstelle auf dem Pi initialisiert. Das bedeutet wir sagen dem Pi wo wir die Led-Kette angeschlossen haben und welchen Mechanismus (Bus) wir verwenden wollen um alle LEDs anzusprechen (in diesem Fall einen SPI-Bus)
@@ -45,6 +47,21 @@ wuerfel_blau = {1: [8],
                 5: [4, 6, 7, 8, 10],
                 6: [4, 5, 6, 7, 9, 10],
                 7: [4, 5, 6, 7, 8, 9, 10]}
+
+wuerfel_gelb= {1: [34],
+                  2: [29,32],
+                  3: [29,32,34],
+                  4: [29,31,32,35],
+                  5: [29,31,32,34,35],
+                  6: [29,30,31,32,33,35]}
+
+wuerfel_gruen= {1: [60],
+                  2: [58,62],
+                  3: [29,32,34],
+                  4: [58,61,62,64],
+                  5: [58,61,60,62,64],
+                  6: [58,59,61,62,63,64]}
+
 
 # ---------------------------------------------------------------------------------------------------------
 
@@ -133,8 +150,12 @@ if __name__ == "__main__":
       GPIO.setmode(GPIO.BCM)
       GPIO.setup(BUTTON_GPIO_ROT, GPIO.IN, pull_up_down=GPIO.PUD_UP)
       GPIO.setup(BUTTON_GPIO_BLAU, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+      GPIO.setup(BUTTON_GPIO_GELB, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+      GPIO.setup(BUTTON_GPIO_GRUEN, GPIO.IN, pull_up_down=GPIO.PUD_UP)
       ist_rot_gedrueckt = False
       ist_blau_gedrueckt = False
+      ist_gelb_gedrueckt = False
+      ist_gruen_gedrueckt = False
 
       # Alle LEDs erstmal aus
       pixels.clear()
@@ -145,8 +166,10 @@ if __name__ == "__main__":
       pixels.show()
 
       # In diesen Variablen speichern wir den momentanen Standort der Spieler wenn es nur eine Figur gibt und benutzen die dann bei jedem Durchlauf
-      standort_rot= 68
-      standort_blau= 93
+      standort_rot= 27
+      standort_blau= 37
+      standort_gelb= 7
+      standort_gruen= 17
 
       # Hier beginnt unsere Hauptschleife. Diese wird solange durchlaufen bis das Programm irgendwann abgebrochen wird. Im Grunde wird immer wieder geguckt ob irgendein Knopf gedrückt wurde und dann dementsprechend reagiert
       while True:
@@ -210,4 +233,62 @@ if __name__ == "__main__":
                         ist_blau_gedrueckt = True
                   else:
                         ist_blau_gedrueckt = False
+            if not GPIO.input(BUTTON_GPIO_GELB):
+                  if not ist_gelb_gedrueckt:
+                        print("GELB")
+                        pixels.set_pixel(spielfeld_leds.get(standort_gelb), Adafruit_WS2801.RGB_to_color( 0,0,0 )) # lösche altes Feld, Figur rückt
+                        pixels.show()
+                        sleep(0.2)
+
+                        zufallszahl = randint(1,6)
+                        neues_feld_fuer_spieler_gelb = feld_gehen(standort_gelb, zufallszahl)
+                        standort_gelb = neues_feld_fuer_spieler_gelb
+                        pixels.set_pixel(spielfeld_leds.get(standort_gelb), Adafruit_WS2801.RGB_to_color( 50,50,0 ))
+
+                        pixels.set_pixel(29, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+                        pixels.set_pixel(30, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+                        pixels.set_pixel(31, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+                        pixels.set_pixel(32, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+                        pixels.set_pixel(33, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+                        pixels.set_pixel(34, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+                        pixels.set_pixel(35, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+                        pixels.show()
+                        sleep(0.2)
+                        for led in wuerfel_gelb.get(zufallszahl,[]):
+                                    pixels.set_pixel(led, Adafruit_WS2801.RGB_to_color( 50,50,0 ))
+                        pixels.show()
+                        sleep(0.2)
+                        ist_gelb_gedrueckt = True
+                  else:
+                        ist_gelb_gedrueckt = False
+
+            if not GPIO.input(BUTTON_GPIO_GRUEN):
+                  if not ist_gruen_gedrueckt:
+                        print("GRUEN")
+
+                        pixels.set_pixel(spielfeld_leds.get(standort_gruen), Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+                        pixels.show()
+                        sleep(0.2)
+
+                        zufallszahl = randint(1,6)
+                        neues_feld_fuer_spieler_gruen = feld_gehen(standort_gruen, zufallszahl)
+                        standort_gruen = neues_feld_fuer_spieler_gruen
+                        pixels.set_pixel(spielfeld_leds.get(standort_gruen), Adafruit_WS2801.RGB_to_color( 0,50,0 ))
+
+                        pixels.set_pixel(58, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+                        pixels.set_pixel(59, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+                        pixels.set_pixel(60, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+                        pixels.set_pixel(61, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+                        pixels.set_pixel(62, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+                        pixels.set_pixel(63, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+                        pixels.set_pixel(64, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
+                        pixels.show()
+                        sleep(0.2)
+                        for led in wuerfel_gruen.get(zufallszahl,[]):
+                                    pixels.set_pixel(led, Adafruit_WS2801.RGB_to_color( 0,50,0 ))
+                        pixels.show()
+                        sleep(0.2)
+                        ist_gruen_gedrueckt = True
+                  else:
+                        ist_gruen_gedrueckt = False
             time.sleep(0.2)
