@@ -183,6 +183,7 @@ if __name__ == "__main__":
                         zufallszahl = randint(1,6) # Erzeuge eine Würfelzufallszahl zwischen 1 und 6
                         neues_feld_fuer_spieler_blau = feld_gehen(standort_blau, zufallszahl) # Ermittele neues Spielfeld für die Figur
                         standort_blau = neues_feld_fuer_spieler_blau # speichere neues Spielfeld für nächsten Durchlauf
+                        print(standort_blau)
                         pixels.set_pixel(spielfeld_leds.get(standort_blau), Adafruit_WS2801.RGB_to_color( 50,0,0 )) # setze neues Spielfeld in Spielfarbe
                         sleep(0.2) # warte kurz
 
