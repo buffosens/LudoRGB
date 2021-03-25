@@ -15,6 +15,10 @@ BUTTON_GPIO_GELB = 19
 BUTTON_GPIO_GRUEN = 13
 LED_COUNT = 100
 
+# Farbem
+
+FARBE_BLAU = (50,0,0)
+
 # Hier wird die Schnittstelle auf dem Pi initialisiert. Das bedeutet wir sagen dem Pi wo wir die Led-Kette angeschlossen haben und welchen Mechanismus (Bus) wir verwenden wollen um alle LEDs anzusprechen (in diesem Fall einen SPI-Bus)
 SPI_PORT = 0
 SPI_DEVICE = 0
@@ -62,6 +66,11 @@ wuerfel_gruen= {1: [60],
                   5: [58,61,60,62,64],
                   6: [58,59,61,62,63,64]}
 
+# Definieren von Startfeld der Figuren
+START_ROT = 27
+START_BLAU = 37
+START_GELB = 7
+START_GRUEN = 17
 
 # ---------------------------------------------------------------------------------------------------------
 
@@ -74,6 +83,27 @@ def feld_gehen(standort, feldzahl):
             endfeld = (endfeld - MAXIMALE_FELDZAHL)
       return endfeld  # Rückgabewert der Funktion ist die neue Position
 
+def check_rauswerfen(neuer_standort):
+      if neuer_standort is standort_rot: # rot wird rausgekegelt
+            standort_rot = START_ROT
+            pixels.set_pixel(spielfeld_leds.get(standort_rot), Adafruit_WS2801.RGB_to_color( 50,0,0 ))
+            pixels.show()
+            sleep(0.2) # warte kurz
+      elif neuer_standort is standort_blau: # blau wird rausgekegelt
+            standort_blau = START_BLAU
+            pixels.set_pixel(spielfeld_leds.get(standort_blau), Adafruit_WS2801.RGB_to_color( 0,0,50 ))
+            pixels.show()
+            sleep(0.2) # warte kurz
+      elif neuer_standort is standort_gelb: # gelb wird rausgekegelt
+            standort_gelb = START_GELB
+            pixels.set_pixel(spielfeld_leds.get(standort_gelb), Adafruit_WS2801.RGB_to_color( 50,50,0 ))
+            pixels.show()
+            sleep(0.2) # warte kurz
+      elif neuer_standort is standort_gruen: # gruen wird rausgekegelt
+            standort_gruen = START_GRUEN
+            pixels.set_pixel(spielfeld_leds.get(standort_gruen), Adafruit_WS2801.RGB_to_color( 0,50,0 ))
+            pixels.show()
+            sleep(0.2) # warte kurz
 
 def initialisiere_spielfeld(pixels):
       # for i in range(100):
@@ -166,10 +196,10 @@ if __name__ == "__main__":
       pixels.show()
 
       # In diesen Variablen speichern wir den momentanen Standort der Spieler wenn es nur eine Figur gibt und benutzen die dann bei jedem Durchlauf
-      standort_rot= 27
-      standort_blau= 37
-      standort_gelb= 7
-      standort_gruen= 17
+      standort_rot = START_ROT
+      standort_blau = START_BLAU
+      standort_gelb = START_GELB
+      standort_gruen = START_GRUEN
 
       # Hier beginnt unsere Hauptschleife. Diese wird solange durchlaufen bis das Programm irgendwann abgebrochen wird. Im Grunde wird immer wieder geguckt ob irgendein Knopf gedrückt wurde und dann dementsprechend reagiert
       while True:
@@ -185,6 +215,8 @@ if __name__ == "__main__":
                         neues_feld_fuer_spieler_rot = feld_gehen(standort_rot, zufallszahl) # Ermittele neues Spielfeld für die Figur
                         standort_rot = neues_feld_fuer_spieler_rot # speichere neues Spielfeld für nächsten Durchlauf
                         pixels.set_pixel(spielfeld_leds.get(standort_rot), Adafruit_WS2801.RGB_to_color( 50,0,0 )) # setze neues Spielfeld in Spielfarbe
+
+                        check_rauswerfen(standort_rot)
 
                         # Setze jetzt die richtigen Farben am Würfel
                         # Mache die roten Würfel-LEDs aus
@@ -211,8 +243,10 @@ if __name__ == "__main__":
                         neues_feld_fuer_spieler_blau = feld_gehen(standort_blau, zufallszahl) # Ermittele neues Spielfeld für die Figur
                         standort_blau = neues_feld_fuer_spieler_blau # speichere neues Spielfeld für nächsten Durchlauf
                         print(standort_blau)
-                        pixels.set_pixel(spielfeld_leds.get(standort_blau), Adafruit_WS2801.RGB_to_color( 50,0,0 )) # setze neues Spielfeld in Spielfarbe
+                        pixels.set_pixel(spielfeld_leds.get(standort_blau), Adafruit_WS2801.RGB_to_color( 0,0,50 )) # setze neues Spielfeld in Spielfarbe
                         sleep(0.2) # warte kurz
+
+                        check_rauswerfen(standort_blau)
 
                         # Setze jetzt die richtigen Farben am Würfel
                         # Mache die blauen Würfel-LEDs aus
@@ -226,7 +260,7 @@ if __name__ == "__main__":
                         pixels.show()
                         sleep(0.2) # Warte kurz
                         for led in wuerfel_blau.get(zufallszahl,[]):
-                              pixels.set_pixel(led, Adafruit_WS2801.RGB_to_color( 50,0,0 ))
+                              pixels.set_pixel(led, Adafruit_WS2801.RGB_to_color( 0,0,50 ))
                         pixels.show()
                         sleep(0.2)
 
@@ -244,6 +278,8 @@ if __name__ == "__main__":
                         neues_feld_fuer_spieler_gelb = feld_gehen(standort_gelb, zufallszahl)
                         standort_gelb = neues_feld_fuer_spieler_gelb
                         pixels.set_pixel(spielfeld_leds.get(standort_gelb), Adafruit_WS2801.RGB_to_color( 50,50,0 ))
+
+                        check_rauswerfen(standort_gelb)
 
                         pixels.set_pixel(29, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
                         pixels.set_pixel(30, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
@@ -274,6 +310,8 @@ if __name__ == "__main__":
                         neues_feld_fuer_spieler_gruen = feld_gehen(standort_gruen, zufallszahl)
                         standort_gruen = neues_feld_fuer_spieler_gruen
                         pixels.set_pixel(spielfeld_leds.get(standort_gruen), Adafruit_WS2801.RGB_to_color( 0,50,0 ))
+
+                        check_rauswerfen(standort_gruen)
 
                         pixels.set_pixel(58, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
                         pixels.set_pixel(59, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
