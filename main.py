@@ -152,12 +152,16 @@ if __name__ == "__main__":
       while True:
             if not GPIO.input(BUTTON_GPIO_ROT): # Der Knopf für den roten Spieler ist gedrückt
                   if not ist_rot_gedrueckt:
+                        # Wir löschen das alte Feld
+                        pixels.set_pixel(spielfeld_leds.get(standort_rot), Adafruit_WS2801.RGB_to_color( 0,0,0 )) # lösche altes Feld, Figur rückt
+                        pixels.show()
+                        sleep(0.2) # warte kurz
+
                         # Wir würfeln
                         zufallszahl = randint(1,6) # Erzeuge eine Würfelzufallszahl zwischen 1 und 6
                         neues_feld_fuer_spieler_rot = feld_gehen(standort_rot, zufallszahl) # Ermittele neues Spielfeld für die Figur
                         standort_rot = neues_feld_fuer_spieler_rot # speichere neues Spielfeld für nächsten Durchlauf
                         pixels.set_pixel(spielfeld_leds.get(standort_rot), Adafruit_WS2801.RGB_to_color( 50,0,0 )) # setze neues Spielfeld in Spielfarbe
-                        sleep(0.2) # warte kurz
 
                         # Setze jetzt die richtigen Farben am Würfel
                         # Mache die roten Würfel-LEDs aus
