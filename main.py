@@ -173,6 +173,7 @@ def initialisiere_spielfeld(pixels):
       pixels.set_pixel(88, Adafruit_WS2801.RGB_to_color(0, 0, 0))
       pixels.set_pixel(89, Adafruit_WS2801.RGB_to_color(0, 0, 0))
 
+# ---------------------------------------------------------------------------------------------------------
 
 # Hier beginnt das Hauptprogramm, das heißt wenn das Skript gestartet wird fängt es immer hier an
 if __name__ == "__main__":
@@ -201,22 +202,57 @@ if __name__ == "__main__":
       standort_gelb = START_GELB
       standort_gruen = START_GRUEN
 
+      ist_im_roten_haus = True
+      felder_gelaufen_rot = 0
+
       # Hier beginnt unsere Hauptschleife. Diese wird solange durchlaufen bis das Programm irgendwann abgebrochen wird. Im Grunde wird immer wieder geguckt ob irgendein Knopf gedrückt wurde und dann dementsprechend reagiert
       while True:
             if not GPIO.input(BUTTON_GPIO_ROT): # Der Knopf für den roten Spieler ist gedrückt
                   if not ist_rot_gedrueckt:
-                        # Wir löschen das alte Feld
-                        pixels.set_pixel(spielfeld_leds.get(standort_rot), Adafruit_WS2801.RGB_to_color( 0,0,0 )) # lösche altes Feld, Figur rückt
-                        pixels.show()
-                        sleep(0.2) # warte kurz
+                        print("ROT")
+                        zufallszahl = randint(1,6)
+                        if ist_im_roten_haus == True:
+                              if zufallszahl == 6:
+                                    pixels.set_pixel(67, Adafruit_WS2801.RGB_to_color(30, 0, 0))
+                                    pixels.show()
+                                    sleep(0.2)
+                                    ist_im_roten_haus = False
+                              else:
+                                    print("Nix, ich brauche eine 6!")
+                        else:
+                              felder_gelaufen_rot_speichern = felder_gelaufen_rot
+                              felder_gelaufen_rot = felder_gelaufen_rot + zufallszahl
+                              print("Rot ist " + felder_gelaufen_rot + " Felder gelaufen")
+                              if felder_gelaufen_rot > 39: # Abfrage ob wir in den Stall laufen müssen
+                                    print("Komme ich in den Stall?")
+                                    if felder_gelaufen_rot > 43:
+                                          print("Nein, drüber!")
+                                          felder_gelaufen_rot = felder_gelaufen_rot_speichern
+                                    else:
+                                          pixels.set_pixel(spielfeld_leds.get(standort_rot), Adafruit_WS2801.RGB_to_color( 0,0,0 )) # lösche altes Feld, Figur rückt
+                                          pixels.set_pixel(56, Adafruit_WS2801.RGB_to_color(10, 0, 0))
+                                          pixels.set_pixel(55, Adafruit_WS2801.RGB_to_color(10, 0, 0))
+                                          pixels.set_pixel(51, Adafruit_WS2801.RGB_to_color(10, 0, 0))
+                                          pixels.set_pixel(75, Adafruit_WS2801.RGB_to_color(10, 0, 0))
+                                          if felder_gelaufen_rot == 40:
+                                                pixels.set_pixel(56, Adafruit_WS2801.RGB_to_color(50, 0, 0))
+                                          elif felder_gelaufen_rot == 41:
+                                                pixels.set_pixel(55, Adafruit_WS2801.RGB_to_color(50, 0, 0))
+                                          elif felder_gelaufen_rot == 42:
+                                                pixels.set_pixel(51, Adafruit_WS2801.RGB_to_color(50, 0, 0))
+                                          elif felder_gelaufen_rot == 43:
+                                                pixels.set_pixel(75, Adafruit_WS2801.RGB_to_color(50, 0, 0))
 
-                        # Wir würfeln
-                        zufallszahl = randint(1,6) # Erzeuge eine Würfelzufallszahl zwischen 1 und 6
-                        neues_feld_fuer_spieler_rot = feld_gehen(standort_rot, zufallszahl) # Ermittele neues Spielfeld für die Figur
-                        standort_rot = neues_feld_fuer_spieler_rot # speichere neues Spielfeld für nächsten Durchlauf
-                        pixels.set_pixel(spielfeld_leds.get(standort_rot), Adafruit_WS2801.RGB_to_color( 50,0,0 )) # setze neues Spielfeld in Spielfarbe
+                                          pixels.show()
+                                          sleep(0.2) # warte kurz
+                              else: # kein Stall, "normales" rund laufen
+                                    pixels.set_pixel(spielfeld_leds.get(standort_rot), Adafruit_WS2801.RGB_to_color( 0,0,0 )) # lösche altes Feld, Figur rückt
+                                    pixels.show()
+                                    sleep(0.2) # warte kurz
 
-                        check_rauswerfen(standort_rot)
+                                    neues_feld_fuer_spieler_rot = feld_gehen(standort_rot, zufallszahl) # Ermittele neues Spielfeld für die Figur
+                                    standort_rot = neues_feld_fuer_spieler_rot # speichere neues Spielfeld für nächsten Durchlauf
+                                    pixels.set_pixel(spielfeld_leds.get(standort_rot), Adafruit_WS2801.RGB_to_color( 30,0,0 )) # setze neues Spielfeld in Spielfarbe
 
                         # Setze jetzt die richtigen Farben am Würfel
                         # Mache die roten Würfel-LEDs aus
@@ -227,10 +263,8 @@ if __name__ == "__main__":
                         pixels.set_pixel(87, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
                         pixels.set_pixel(88, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
                         pixels.set_pixel(89, Adafruit_WS2801.RGB_to_color( 0,0,0 ))
-                        pixels.show()
-                        sleep(0.2) # Warte kurz
                         for led in wuerfel_rot.get(zufallszahl,[]):
-                              pixels.set_pixel(led, Adafruit_WS2801.RGB_to_color( 50,0,0 ))
+                              pixels.set_pixel(led, Adafruit_WS2801.RGB_to_color( 30,0,0 ))
                         pixels.show()
                         sleep(0.2)
                         ist_rot_gedrueckt = True
